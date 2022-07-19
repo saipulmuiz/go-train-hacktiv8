@@ -1,0 +1,256 @@
+swagger: "2.0"
+info:
+  description: "This is a sample api for practice with golang"
+  version: "1.0.0"
+  title: "Golang Api"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@swagger.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "petstore.swagger.io"
+basePath: "/v1"
+tags:
+- name: "user"
+  description: "Access user data"
+- name: "photo"
+  description: "Access photo of user"
+schemes:
+- "https"
+- "http"
+paths:
+  /users:
+    post:
+      tags:
+      - "user"
+      summary: "Add a user to db"
+      description: ""
+      operationId: "addUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User object that needs to be added to db"
+        required: true
+        schema:
+          type: "object"
+          required:
+          - "username"
+          - "email"
+          - "password"
+          properties:
+            id:
+              type: "integer"
+              format: "int64"
+            username:
+              type: "string"
+              example: "hactiv8"
+            email:
+              type: "string"
+              example: "admin@hactiv8.com"
+            password:
+              type: "string"
+              example: "admin"
+            age:
+              type: "integer"
+              example: 24
+            created_at:
+              type: "string"
+              example: "15-07-2022"
+            updated_at:
+              type: "string"
+              example: "15-07-2022"
+      responses:
+        "405":
+          description: "Invalid input"
+        "201":
+          description: "User created successfully"
+          schema:
+            type: "object"
+            properties:
+              status:
+                type: "boolean"
+                example: true
+              message:
+                type: "string"
+                example: "User created successfully"
+    get:
+      tags:
+      - "user"
+      summary: "Get all user"
+      description: "get all user"
+      operationId: "getUser"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              type: "object"
+              properties:
+                id:
+                  type: "integer"
+                  format: "int64"
+                username:
+                  type: "string"
+                  example: "hactiv8"
+                email:
+                  type: "string"
+                  example: "admin@hactiv8.com"
+                age:
+                  type: "integer"
+                  example: 24
+                created_at:
+                  type: "string"
+                  example: "15-07-2022"
+                updated_at:
+                  type: "string"
+                  example: "15-07-2022"
+        "400":
+          description: "Invalid status value"
+    put:
+      tags:
+      - "user"
+      summary: "Update an existing user"
+      description: ""
+      operationId: "updateUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        type: "string"
+        required: true
+        name: "authorization"
+        description: "bearer token"
+      - in: "body"
+        name: "body"
+        description: "User object that needs to be added to DB"
+        required: true
+        schema:
+          type: "object"
+          required:
+          - "username"
+          - "email"
+          - "password"
+          properties:
+            id:
+              type: "integer"
+              format: "int64"
+            username:
+              type: "string"
+              example: "hactiv8"
+            email:
+              type: "string"
+              example: "admin@hactiv8.com"
+            password:
+              type: "string"
+              example: "admin"
+            age:
+              type: "integer"
+              example: 24
+            created_at:
+              type: "string"
+              example: "15-07-2022"
+            updated_at:
+              type: "string"
+              example: "15-07-2022"
+      responses:
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Pet not found"
+        "405":
+          description: "Validation exception"
+  /users/{userID}:
+    delete:
+      tags:
+      - "user"
+      summary: "Deletes a user"
+      description: ""
+      operationId: "deleteUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "api_key"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "userId"
+        in: "path"
+        description: "User id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Pet not found"
+  /photos:
+    post:
+      tags:
+      - "photo"
+      summary: "Add a photo to db"
+      description: ""
+      operationId: "addPhoto"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User object that needs to be added to db"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            id:
+              type: "integer"
+              format: "int64"
+            title:
+              type: "string"
+              example: "photo1"
+            caption:
+              type: "string"
+              example: "photo 1 caption"
+            photo_uri:
+              type: "string"
+              example: "photo_uri"
+      responses:
+        "405":
+          description: "Invalid input"
+        "201":
+          description: "Photo created successfully"
+          schema:
+            type: "object"
+            properties:
+              status:
+                type: "boolean"
+                example: true
+              message:
+                type: "string"
+                example: "Photo created successfully"
+              data:
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                    format: "int64"
+                  title:
+                    type: "string"
+                    example: "photo1"
+                  caption:
+                    type: "string"
+                    example: "photo 1 caption"
+                  photo_uri:
+                    type: "string"
+                    example: "photo_uri"

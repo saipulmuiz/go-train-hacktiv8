@@ -58,7 +58,7 @@ func main() {
 		},
 	}
 
-	for _, t := range products {
+	for _, t := range trxs {
 		pName := ""
 		pStock := ""
 		isExist := false
@@ -83,12 +83,4 @@ func main() {
 
 		fmt.Println(strings.Repeat("=", 20))
 	}
-
-	for _, trx := range trxs {
-		fmt.Printf("Id: %s, Username: %s, Id Product: %s, Amount: %s\n", trx["id"], trx["username"], trx["id_product"], trx["amount"])
-	}
-	for _, product := range products {
-		fmt.Printf("Id: %s, name: %s, stock: %s\n", product["id"], product["name"], product["stock"])
-	}
-
 }
