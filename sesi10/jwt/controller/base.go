@@ -1,4 +1,4 @@
-package controllers
+package controller
 
 import (
 	"net/http"
@@ -6,21 +6,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func badRequestResponse(ctx *gin.Context, payload interface{}) {
+func badRequestJsonResponse(ctx *gin.Context, err interface{}) {
 	writeJsonResponse(ctx, http.StatusBadRequest, gin.H{
 		"success": false,
-		"error":   payload,
-	})
-}
-
-func notFoundResponse(ctx *gin.Context, payload interface{}) {
-	writeJsonResponse(ctx, http.StatusNotFound, gin.H{
-		"success": false,
-		"error":   payload,
+		"error":   err,
 	})
 }
 
 func noDataJsonResponse(ctx *gin.Context, err interface{}) {
+	writeJsonResponse(ctx, http.StatusNotFound, gin.H{
+		"success": false,
+		"error":   err,
+	})
+}
+
+func unauthorizeJsonResponse(ctx *gin.Context, err interface{}) {
 	writeJsonResponse(ctx, http.StatusNotFound, gin.H{
 		"success": false,
 		"error":   err,

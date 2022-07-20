@@ -19,7 +19,7 @@ func NewOrderController(db *gorm.DB) *OrderController {
 	}
 }
 
-func (p *OrderController) GetAllOrder(ctx *gin.Context) {
+func (oc *OrderController) GetAllOrder(ctx *gin.Context) {
 	limit := ctx.Query("limit")
 	limitInt := 10
 
@@ -33,7 +33,7 @@ func (p *OrderController) GetAllOrder(ctx *gin.Context) {
 	var order []models.Order
 	var total int
 
-	err := p.db.Limit(limitInt).Find(&order).Count(&total).Preload("Items").Error
+	err := oc.db.Limit(limitInt).Preload("Items").Find(&order).Count(&total).Error
 	if err != nil {
 		if err.Error() == gorm.ErrRecordNotFound.Error() {
 			notFoundResponse(ctx, err.Error())
@@ -53,9 +53,8 @@ func (p *OrderController) GetAllOrder(ctx *gin.Context) {
 	})
 }
 
-func (p *OrderController) CreateOrder(ctx *gin.Context) {
+func (oc *OrderController) CreateOrder(ctx *gin.Context) {
 	var order models.Order
-	var items []models.Item
 
 	err := ctx.ShouldBindJSON(&order)
 	if err != nil {
@@ -63,19 +62,12 @@ func (p *OrderController) CreateOrder(ctx *gin.Context) {
 		return
 	}
 
-	p.db.Create(&order)
+	oc.db.Create(&order)
 	for _, item := range order.Items {
-		// item := &items[index]{orderId: order.OrderId}
-		// item.OrderId = int(order.OrderId)
-		p.db.Create(item)
+		item.OrderId = int(order.OrderId)
+		oc.db.Create(&item)
 	}
-
-	// for _, row := range order.Items {
-	// 	sqlStr += "(?, ?, ?),"
-	// 	vals = append(vals, row["v1"], row["v2"], row["v3"])
-	// }
-	// err = p.db.Create(&order).Error
-	err = p.db.Model(&order).Association("Items").Append(&items).Error
+	err = oc.db.Model(&order).Association("Items").Error
 	if err != nil {
 		badRequestResponse(ctx, err.Error())
 		return
@@ -83,130 +75,65 @@ func (p *OrderController) CreateOrder(ctx *gin.Context) {
 
 	writeJsonResponse(ctx, http.StatusCreated, gin.H{
 		"success": true,
-		"message": "order created success",
+		"message": "Order created successfully",
 	})
 }
 
-// func GetAllOrder(ctx *gin.Context) {
-// 	limit := ctx.Query("limit")
-// 	limitInt := 10
+func (oc *OrderController) UpdateOrder(ctx *gin.Context) {
+	orderId := ctx.Param("orderId")
+	var order models.Order
 
-// 	if limit != "" {
-// 		l, err := strconv.Atoi(limit)
-// 		if err == nil {
-// 			limitInt = l
-// 		}
-// 	}
+	err := ctx.ShouldBindJSON(&order)
+	if err != nil {
+		badRequestResponse(ctx, err.Error())
+		return
+	}
 
-// 	var people []models.Order
-// 	var total int
+	var orderDb models.Order
+	err = oc.db.First(&orderDb, "order_id=?", orderId).Error
+	if err != nil {
+		if err.Error() == gorm.ErrRecordNotFound.Error() {
+			noDataJsonResponse(ctx, err.Error())
+			return
+		}
+		internalServerJsonResponse(ctx, err.Error())
+		return
+	}
 
-// 	err := p.db.Limit(limitInt).Find(&people).Count(&total).Error
-// 	if err != nil {
-// 		if err.Error() == gorm.ErrRecordNotFound.Error() {
-// 			notFoundResponse(ctx, err.Error())
-// 			return
-// 		}
-// 		badRequestResponse(ctx, err.Error())
-// 		return
-// 	}
+	err = oc.db.Model(&order).Where("order_id = ?", orderId).Updates(&order).Error
+	if err != nil {
+		badRequestResponse(ctx, err.Error())
+		return
+	}
 
-// 	writeJsonResponse(ctx, http.StatusOK, gin.H{
-// 		"success": true,
-// 		"payload": people,
-// 		"query": map[string]interface{}{
-// 			"limit": limitInt,
-// 			"total": total,
-// 		},
-// 	})
-// }
+	writeJsonResponse(ctx, http.StatusOK, gin.H{
+		"success": true,
+		"message": "Order updated successfully",
+	})
+}
 
-// func GetCar(ctx *gin.Context) {
-// 	carID := ctx.Param("carID")
-// 	condition := false
-// 	var carData Car
+func (oc *OrderController) DeleteOrder(ctx *gin.Context) {
+	orderId := ctx.Param("orderId")
 
-// 	for i, car := range CarDatas {
-// 		if carID == car.CarID {
-// 			condition = true
-// 			carData = CarDatas[i]
-// 			break
-// 		}
-// 	}
+	var orderDb models.Order
+	err := oc.db.First(&orderDb, orderId).Error
+	if err != nil {
+		if err.Error() == gorm.ErrRecordNotFound.Error() {
+			noDataJsonResponse(ctx, err.Error())
+			return
+		}
+		internalServerJsonResponse(ctx, err.Error())
+		return
+	}
 
-// 	if !condition {
-// 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-// 			"error_status":  "Data Not Found",
-// 		})
-// 		return
-// 	}
+	err = oc.db.Debug().Model(&orderDb).Delete(&orderDb, orderId).Delete(orderDb.Items, "order_id = ?", orderId).Error
+	if err != nil {
+		badRequestResponse(ctx, err.Error())
+		return
+	}
 
-// 	ctx.JSON(http.StatusOK, gin.H{
-// 		"car": carData,
-// 	})
-// }
-
-// func CreateCar(ctx *gin.Context) {
-// 	var newCar Car
-
-// 	if err := ctx.ShouldBindJSON(&newCar); err != nil {
-// 		ctx.AbortWithError(http.StatusBadRequest, err)
-// 		return
-// 	}
-// 	CarDatas = append(CarDatas, newCar)
-
-// 	ctx.JSON(http.StatusCreated, gin.H{
-// 		"car": newCar,
-// 	})
-// }
-
-// func UpdateCar(ctx *gin.Context) {
-// 	carID := ctx.Param("carID")
-// 	condition := false
-// 	var updatedCar Car
-
-// 	if err := ctx.ShouldBindJSON(&updatedCar); err != nil {
-// 		ctx.AbortWithError(http.StatusBadRequest, err)
-// 		return
-// 	}
-
-// 	for i, car := range CarDatas {
-// 		if carID == car.CarID {
-// 			condition = true
-// 			CarDatas[i] = updatedCar
-// 			CarDatas[i].CarID = carID
-// 			break
-// 		}
-// 	}
-
-// 	if !condition {
-// 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-// 			"error_status":  "Data Not Found",
-// 		})
-// 		return
-// 	}
-// }
-
-// func DeleteCar(ctx *gin.Context) {
-// 	carID := ctx.Param("carID")
-// 	condition := false
-// 	var carIndex int
-
-// 	for i, car := range CarDatas {
-// 		if carID == car.CarID {
-// 			condition = true
-// 			carIndex = i
-// 			break
-// 		}
-// 	}
-
-// 	if !condition {
-// 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-// 			"error_status":  "Data Not Found",
-// 		})
-// 		return
-// 	}
-
-// 	copy(CarDatas[carIndex:], CarDatas[carIndex+1:])
-// 	CarDatas[len(CarDatas)-1] = Car{}
-// }
+	writeJsonResponse(ctx, http.StatusCreated, gin.H{
+		"success": true,
+		"message": "Order deleted success",
+	})
+}

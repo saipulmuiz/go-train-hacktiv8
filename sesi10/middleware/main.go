@@ -2,27 +2,26 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
+	"time"
 )
 
-type Trace struct {
-	TraceId      string
-	Method       string
-	ResponseTime string
-	Path         string
-	Request      string
-}
-
 func main() {
-	http.HandleFunc("/", mid1(cors(greet)))
-	http.HandleFunc("/hello", mid1(hello))
-
+	mux := route()
 	port := ":4444"
 
 	log.Println("server running at port", port)
-	http.ListenAndServe(port, nil)
+	http.ListenAndServe(port, mux)
+}
+
+func route() *http.ServeMux {
+	endpoint := http.HandlerFunc(greet)
+	mux := http.NewServeMux()
+	mux.Handle("/", mid1(endpoint))
+	mux.Handle("/hello", mid1(http.HandlerFunc(hello)))
+
+	return mux
 }
 
 // application handler
@@ -42,32 +41,13 @@ func hello(rw http.ResponseWriter, r *http.Request) {
 }
 
 // middleware
-func mid1(next http.HandlerFunc) http.HandlerFunc {
-	return func(rw http.ResponseWriter, r *http.Request) {
-		// now := time.Now()
-		fmt.Println("mid1 called")
+func mid1(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		now := time.Now()
+
 		next.ServeHTTP(rw, r)
 
-		// end := time.Since(now)
-		// log.Println("response time :", end.Seconds())
-	}
-}
-
-/*
-	func trace() -> middleware
-		log -> method, response time, path, request, traceId
-
-	type Log struct {
-
-	}
-
-	-> convert log to byte
-	-> display in log.Println()
-*/
-
-func cors(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Methods", "POST")
-		next.ServeHTTP(w, r)
-	}
+		end := time.Since(now)
+		log.Println("response time :", end.Seconds())
+	})
 }

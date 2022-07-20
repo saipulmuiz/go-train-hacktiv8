@@ -1,0 +1,322 @@
+swagger: "2.0"
+info:
+  description: "This is a sample api for assignment2 golang - Hacktiv8 - Saipul Muiz"
+  version: "1.0.0"
+  title: "Assignment2 Api - Saipul Muiz"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "saipulmuiz87@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost:4444"
+basePath: "/"
+tags:
+- name: "order"
+  description: "Access order data"
+schemes:
+- "http"
+paths:
+  /orders:
+    post:
+      tags:
+      - "order"
+      summary: "Add a order to db"
+      description: ""
+      operationId: "createOrder"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Order object that needs to be added to db"
+        required: true
+        schema:
+          type: "object"
+          required:
+          - "customerName"
+          properties:
+            customerName:
+              type: "string"
+              example: "Tom Jerry"
+            orderedAt:
+              type: "string"
+              example: "2019-11-09T21:21:46+00:00"
+            items:
+              type: "array"
+              items:
+                type: "object"
+                properties:
+                  itemId:
+                    type: "integer"
+                    example: "1"
+                  itemCode:
+                    type: "string"
+                    example: "123"
+                  description:
+                    type: "string"
+                    example: "IPhone 10X"
+                  quantity:
+                    type: "integer"
+                    example: "1"
+      responses:
+        "400":
+          description: "Invalid input"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "Input not valid"
+        "201":
+          description: "Order created successfully"
+          schema:
+            type: "object"
+            properties:
+              status:
+                type: "boolean"
+                example: true
+              message:
+                type: "string"
+                example: "Order created successfully"
+    get:
+      tags:
+      - "order"
+      summary: "Get all order"
+      description: "get all order"
+      operationId: "getOrder"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            properties:
+              payload:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    orderId:
+                      type: "integer"
+                      example: "1"
+                    customerName:
+                      type: "string"
+                      example: "Tom Jerry"
+                    orderedAt:
+                      type: "string"
+                      example: "IPhone 10X"
+                    Items:
+                      type: "array"
+                      items:
+                        type: "object"
+                        properties:
+                          itemId:
+                            type: "integer"
+                            example: "1"
+                          itemCode:
+                            type: "string"
+                            example: "123"
+                          description:
+                            type: "string"
+                            example: "IPhone 10X"
+                          quantity:
+                            type: "integer"
+                            example: "10"
+                          orderId:
+                            type: "integer"
+                            example: "1"
+              query:
+                type: "object"
+                properties:
+                  limit: 
+                    type: "integer"
+                    example: "10"
+                  total:
+                    type: "integer"
+                    example: "3"
+              success:
+                type: "boolean"
+                example: "true"
+        "404":
+          description: "Not found response"
+          schema:
+            type: "object"
+            properties:
+              status:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "Data not found"
+        "400":
+          description: "Invalid input"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "Input not valid"
+  /orders/{orderId}:
+    put:
+      tags:
+      - "order"
+      summary: "Update an existing order"
+      description: ""
+      operationId: "updateOrder"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "orderId"
+        in: "path"
+        description: "Order id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "body"
+        description: "Order object that needs to be updated to db"
+        required: true
+        schema:
+          type: "object"
+          required:
+          - "customerName"
+          properties:
+            customerName:
+              type: "string"
+              example: "Spike Tyke"
+            orderedAt:
+              type: "string"
+              example: "2019-11-09T21:21:46Z"
+            items:
+              type: "array"
+              items:
+                type: "object"
+                properties:
+                  itemId:
+                    type: "integer"
+                    example: "1"
+                  itemCode:
+                    type: "string"
+                    example: "123"
+                  description:
+                    type: "string"
+                    example: "IPhone 10X"
+                  quantity:
+                    type: "integer"
+                    example: "10"
+      responses:
+        "400":
+          description: "Invalid input"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "Input not valid"
+        "404":
+          description: "Not found response"
+          schema:
+            type: "object"
+            properties:
+              status:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "record not found"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              status:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "internal server error"
+        "200":
+          description: "Order updated successfully"
+          schema:
+            type: "object"
+            properties:
+              status:
+                type: "boolean"
+                example: true
+              message:
+                type: "string"
+                example: "Order updated successfully"
+    delete:
+      tags:
+      - "order"
+      summary: "Delete a order"
+      description: ""
+      operationId: "deleteOrder"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "orderId"
+        in: "path"
+        description: "Order id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "400":
+          description: "Invalid input"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "Input not valid"
+        "404":
+          description: "Not found response"
+          schema:
+            type: "object"
+            properties:
+              status:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "record not found"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              status:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "internal server error"
+        "200":
+          description: "Order deleted successfully"
+          schema:
+            type: "object"
+            properties:
+              status:
+                type: "boolean"
+                example: true
+              message:
+                type: "string"
+                example: "Order deleted successfully"
