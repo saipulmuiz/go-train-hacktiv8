@@ -55,6 +55,7 @@ func (p *OrderController) GetAllOrder(ctx *gin.Context) {
 
 func (p *OrderController) CreateOrder(ctx *gin.Context) {
 	var order models.Order
+	var items []models.Item
 
 	err := ctx.ShouldBindJSON(&order)
 	if err != nil {
@@ -65,6 +66,7 @@ func (p *OrderController) CreateOrder(ctx *gin.Context) {
 	p.db.Create(&order)
 	for _, item := range order.Items {
 		// item := &items[index]{orderId: order.OrderId}
+		// item.OrderId = int(order.OrderId)
 		p.db.Create(item)
 	}
 
@@ -73,7 +75,7 @@ func (p *OrderController) CreateOrder(ctx *gin.Context) {
 	// 	vals = append(vals, row["v1"], row["v2"], row["v3"])
 	// }
 	// err = p.db.Create(&order).Error
-	err = p.db.Model(&order).Association("Items").Append([]models.Item{}).Error
+	err = p.db.Model(&order).Association("Items").Append(&items).Error
 	if err != nil {
 		badRequestResponse(ctx, err.Error())
 		return
