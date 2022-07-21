@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment 3 - Golang - Saipul Muiz</title>
+</head>
+<style type="text/css">
+    @import "https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,200,600,900,700";
+
+    html,
+    body {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        font-family: 'Source Sans Pro', sans-serif
+    }
+
+    #main-column {
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        color: #cdcfce
+    }
+
+    #main-column>div {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        flex: 1 1 auto
+    }
+
+    #main-column>#about {
+        flex: 1 1 0
+    }
+
+    #main-column>div#sensorValues {
+        flex: 1 1 0
+    }
+
+    #main-column>div#sensorData {
+        flex: 2 1 0;
+        margin: 0;
+        text-align: center;
+        font-size: 32px
+    }
+
+    .dashboard>div {
+        padding: 1rem
+    }
+
+    .dashboard>div:nth-child(1) {
+        background: #333
+    }
+
+    .dashboard>div:nth-child(2) {
+        background: #383838
+    }
+
+    .dashboard>div:nth-child(3) {
+        background: #3d3d3d
+    }
+
+    .dashboard>div h1,
+    .dashboard>div h2 {
+        margin: 0 0 .2rem
+    }
+
+    .dashboard>div a {
+        text-decoration: none
+    }
+
+    .dashboard>div a.mkr-link {
+        color: #2b908f
+    }
+
+    .dashboard>div a.j5-link {
+        color: #ecdb43
+    }
+
+    .dashboard>div p {
+        margin: 0
+    }
+
+    div#about h1 span:nth-of-type(1) {
+        color: #2b908f;
+        font-weight: 400
+    }
+
+    div#about h1 span:nth-of-type(2) {
+        color: #90ee7e
+    }
+
+    div#sensorValues {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        user-select: none
+    }
+
+    div#sensorValues div.sensor-values {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        text-align: center
+    }
+
+    div#sensorValues div.sensor-values>div {
+        font-size: 4em;
+        font-weight: 200
+    }
+
+    div#sensorValues div.sensor-values>label {
+        font-size: 1.5em
+    }
+
+    div#sensorValues div.sensor-values .water {
+        color: #2b908f
+    }
+
+    div#sensorValues div.sensor-values .wind {
+        color: #90ee7e
+    }
+
+    @media screen and (max-width: 500px) {
+        div#about {
+            display: none
+        }
+
+        div#sensorValues {
+            flex-direction: column;
+            font-size: .8em;
+            align-items: center
+        }
+
+        div#sensorValues div.sensor-values {
+            flex-direction: row;
+            align-items: flex-end
+        }
+
+        div#sensorValues div.sensor-values label {
+            margin-left: 10px;
+            margin-bottom: 10px
+        }
+    }
+
+    @media screen and (max-height: 430px) {
+        div#about {
+            display: none
+        }
+
+        div#sensorValues {
+            flex-direction: row;
+            font-size: .5em
+        }
+
+        div#sensorValues div.sensor-values>label {
+            font-size: 1em
+        }
+    }
+</style>
+
+<body>
+    <section class="dashboard" id="main-column">
+        <div id="about">
+            <h1> <span>ASSIGNMENT 3</span><span> Golang Course - Saipul Muiz</span></h1>
+            <p>System Monitoring Water & Wind By <a href="https://github.com/saipulmuiz/" class="mkr-link">Saipul
+                    Muiz</a>.</p>
+        </div>
+        <div id="sensorValues">
+            <div class="sensor-values">
+                <label>Water</label>
+                <div class="water-status"><span class="water" id="water">12.0</span> m</div>
+                <h3><span>Status : </span><span id="status-water"> -</span></h1>
+            </div>
+            <div class="sensor-values">
+                <label>Wind</label>
+                <div class="wind-status"><span class="wind" id="wind">0.7</span> m/s</div>
+                <h3><span>Status : </span><span id="status-wind"> -</span></h1>
+            </div>
+        </div>
+        <div id="sensorData">
+            <h2>Golang Course - Hacktiv8</h2>
+        </div>
+    </section>
+    <script type="text/javascript">
+        const url = "http://localhost:4444/status"
+        const elmWater = document.getElementById('water')
+        const elmWind = document.getElementById('wind')
+        const elmStatusWater = document.getElementById('status-water')
+        const elmStatusWind = document.getElementById('status-wind')
+        // getData(url)
+        setInterval(() => {
+            getData(url)
+        }, 1500);
+        async function getData(url) {
+            try {
+                let res = await fetch(url);
+                let data = await res.json()
+                if (data.status) {
+                    elmWater.innerHTML = data.payload.status.water
+                    elmWind.innerHTML = data.payload.status.wind
+                    elmStatusWater.innerHTML = data.statusWater
+                    elmStatusWind.innerHTML = data.statusWind
+                }
+                console.log(data);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    </script>
+</body>
+
+</html>
