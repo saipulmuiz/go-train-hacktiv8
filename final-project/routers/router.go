@@ -30,7 +30,7 @@ func StartServer() *gin.Engine {
 	photoGroup := router.Group("/photos")
 	{
 
-		// photoGroup.Use(middleware.Auth())
+		photoGroup.Use(middleware.Auth())
 		photoGroup.GET("/", photoController.GetPhotos)
 		photoGroup.POST("/", photoController.CreatePhoto)
 		photoGroup.PUT("/:photoId", photoController.UpdatePhoto)
@@ -42,7 +42,7 @@ func StartServer() *gin.Engine {
 
 		// commentGroup.Use(middleware.Auth())
 		commentGroup.GET("/", commentController.GetComments)
-		commentGroup.POST("/", commentController.CreateComment)
+		commentGroup.POST("/", commentController.PostComment)
 		commentGroup.PUT("/:commentId", commentController.UpdateComment)
 		commentGroup.DELETE("/:commentId", commentController.UpdateComment)
 	}

@@ -16,7 +16,7 @@ func NewCommentController(db *gorm.DB) *CommentController {
 	return &CommentController{db: db}
 }
 
-func (p *CommentController) CreateComment(ctx *gin.Context) {
+func (c *CommentController) PostComment(ctx *gin.Context) {
 	var comment models.Comment
 
 	err := ctx.ShouldBindJSON(&comment)
@@ -28,7 +28,7 @@ func (p *CommentController) CreateComment(ctx *gin.Context) {
 	id, _ := ctx.Get("id")
 	comment.UserId = uint(id.(float64))
 
-	err = p.db.Create(&comment).Error
+	err = c.db.Create(&comment).Error
 	if err != nil {
 		internalServerJsonResponse(ctx, err.Error())
 		return
@@ -37,11 +37,11 @@ func (p *CommentController) CreateComment(ctx *gin.Context) {
 	writeJsonResponse(ctx, http.StatusCreated, comment)
 }
 
-func (p *CommentController) GetComments(ctx *gin.Context) {
+func (c *CommentController) GetComments(ctx *gin.Context) {
 	var comments []models.Comment
 
 	// id, _ := ctx.Get("id")
-	err := p.db.Find(&comments).Error
+	err := c.db.Find(&comments).Error
 	if err != nil {
 		internalServerJsonResponse(ctx, err.Error())
 		return
@@ -50,7 +50,7 @@ func (p *CommentController) GetComments(ctx *gin.Context) {
 	writeJsonResponse(ctx, http.StatusCreated, comments)
 }
 
-func (p *CommentController) UpdateComment(ctx *gin.Context) {
+func (c *CommentController) UpdateComment(ctx *gin.Context) {
 	commentId := ctx.Param("commentId")
 	var comment models.Comment
 
@@ -61,7 +61,7 @@ func (p *CommentController) UpdateComment(ctx *gin.Context) {
 	}
 
 	var commentDb models.Comment
-	err = p.db.First(&commentDb, "comment_id=?", commentId).Error
+	err = c.db.First(&commentDb, "comment_id=?", commentId).Error
 	if err != nil {
 		if err.Error() == gorm.ErrRecordNotFound.Error() {
 			noDataJsonResponse(ctx, err.Error())
@@ -71,7 +71,7 @@ func (p *CommentController) UpdateComment(ctx *gin.Context) {
 		return
 	}
 
-	err = p.db.Model(&comment).Where("comment_id = ?", commentId).Updates(&comment).Error
+	err = c.db.Model(&comment).Where("comment_id = ?", commentId).Updates(&comment).Error
 	if err != nil {
 		badRequestResponse(ctx, err.Error())
 		return
@@ -80,11 +80,11 @@ func (p *CommentController) UpdateComment(ctx *gin.Context) {
 	writeJsonResponse(ctx, http.StatusOK, commentDb)
 }
 
-func (p *CommentController) DeleteComment(ctx *gin.Context) {
+func (c *CommentController) DeleteComment(ctx *gin.Context) {
 	commentId := ctx.Param("commentId")
 
 	var commentDb models.Comment
-	err := p.db.First(&commentDb, commentId).Error
+	err := c.db.First(&commentDb, commentId).Error
 	if err != nil {
 		if err.Error() == gorm.ErrRecordNotFound.Error() {
 			noDataJsonResponse(ctx, err.Error())
@@ -94,7 +94,7 @@ func (p *CommentController) DeleteComment(ctx *gin.Context) {
 		return
 	}
 
-	err = p.db.Model(&commentDb).Delete(&commentDb, commentId).Error
+	err = c.db.Model(&commentDb).Delete(&commentDb, commentId).Error
 	if err != nil {
 		badRequestResponse(ctx, err.Error())
 		return
