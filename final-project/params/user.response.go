@@ -16,3 +16,8 @@ type UserUpdateResponse struct {
 	Age       uint      `json:"age"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+
+type UserPhotoResponse struct {
+	Email    string `json:"email"`
+	Username string `json:"username"`
+}

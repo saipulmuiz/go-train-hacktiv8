@@ -39,7 +39,7 @@ func writeJsonResponse(ctx *gin.Context, status int, payload interface{}) {
 }
 
 func unauthorizeJsonResponse(ctx *gin.Context, err interface{}) {
-	writeJsonResponse(ctx, http.StatusNotFound, gin.H{
+	writeJsonResponse(ctx, http.StatusUnauthorized, gin.H{
 		"success": false,
 		"error":   err,
 	})

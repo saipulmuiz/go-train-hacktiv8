@@ -148,7 +148,7 @@ func (u *UserController) DeleteUser(ctx *gin.Context) {
 		return
 	}
 
-	writeJsonResponse(ctx, http.StatusCreated, gin.H{
+	writeJsonResponse(ctx, http.StatusOK, gin.H{
 		"message": "Your account has been successfully deleted",
 	})
 }

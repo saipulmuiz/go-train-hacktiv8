@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"final-project/models"
+	"final-project/params"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -34,20 +35,46 @@ func (p *PhotoController) CreatePhoto(ctx *gin.Context) {
 		return
 	}
 
-	writeJsonResponse(ctx, http.StatusCreated, photo)
+	response := params.PhotoPostResponse{
+		Id:        photo.Id,
+		Title:     photo.Title,
+		Caption:   photo.Caption,
+		PhotoUrl:  photo.PhotoUrl,
+		UserId:    photo.UserId,
+		CreatedAt: photo.CreatedAt,
+	}
+
+	writeJsonResponse(ctx, http.StatusCreated, response)
 }
 
 func (p *PhotoController) GetPhotos(ctx *gin.Context) {
 	var photos []models.Photo
 
-	// id, _ := ctx.Get("id")
-	err := p.db.Find(&photos).Error
+	err := p.db.Preload("User").Find(&photos).Error
 	if err != nil {
 		internalServerJsonResponse(ctx, err.Error())
 		return
 	}
 
-	writeJsonResponse(ctx, http.StatusCreated, photos)
+	var resPhotos []params.PhotoGetResponse
+	for _, photo := range photos {
+		resPhoto := params.PhotoGetResponse{
+			Id:        photo.Id,
+			Title:     photo.Title,
+			Caption:   photo.Caption,
+			PhotoUrl:  photo.PhotoUrl,
+			UserId:    photo.UserId,
+			CreatedAt: photo.CreatedAt,
+			UpdatedAt: photo.UpdatedAt,
+			User: models.UserPhoto{
+				Email:    photo.User.Email,
+				Username: photo.User.Username,
+			},
+		}
+		resPhotos = append(resPhotos, resPhoto)
+	}
+
+	writeJsonResponse(ctx, http.StatusOK, resPhotos)
 }
 
 func (p *PhotoController) UpdatePhoto(ctx *gin.Context) {
@@ -59,9 +86,11 @@ func (p *PhotoController) UpdatePhoto(ctx *gin.Context) {
 		badRequestResponse(ctx, err.Error())
 		return
 	}
+	id, _ := ctx.Get("id")
+	userId := uint(id.(float64))
 
 	var photoDb models.Photo
-	err = p.db.First(&photoDb, "photo_id=?", photoId).Error
+	err = p.db.First(&photoDb, photoId).Error
 	if err != nil {
 		if err.Error() == gorm.ErrRecordNotFound.Error() {
 			noDataJsonResponse(ctx, err.Error())
@@ -71,17 +100,33 @@ func (p *PhotoController) UpdatePhoto(ctx *gin.Context) {
 		return
 	}
 
-	err = p.db.Model(&photo).Where("photo_id = ?", photoId).Updates(&photo).Error
+	if photoDb.UserId != userId {
+		unauthorizeJsonResponse(ctx, "You have not access to this data..")
+		return
+	}
+
+	err = p.db.Model(&photoDb).Updates(&photo).Error
 	if err != nil {
 		badRequestResponse(ctx, err.Error())
 		return
 	}
 
-	writeJsonResponse(ctx, http.StatusOK, photoDb)
+	response := params.PhotoUpdateResponse{
+		Id:        photoDb.Id,
+		Title:     photoDb.Title,
+		Caption:   photoDb.Caption,
+		PhotoUrl:  photoDb.PhotoUrl,
+		UserId:    photoDb.UserId,
+		UpdatedAt: photoDb.UpdatedAt,
+	}
+
+	writeJsonResponse(ctx, http.StatusOK, response)
 }
 
 func (p *PhotoController) DeletePhoto(ctx *gin.Context) {
 	photoId := ctx.Param("photoId")
+	id, _ := ctx.Get("id")
+	userId := uint(id.(float64))
 
 	var photoDb models.Photo
 	err := p.db.First(&photoDb, photoId).Error
@@ -94,13 +139,18 @@ func (p *PhotoController) DeletePhoto(ctx *gin.Context) {
 		return
 	}
 
-	err = p.db.Model(&photoDb).Delete(&photoDb, photoId).Error
+	if photoDb.UserId != userId {
+		unauthorizeJsonResponse(ctx, "You have not access to this data..")
+		return
+	}
+
+	err = p.db.Delete(&photoDb).Error
 	if err != nil {
 		badRequestResponse(ctx, err.Error())
 		return
 	}
 
-	writeJsonResponse(ctx, http.StatusCreated, gin.H{
+	writeJsonResponse(ctx, http.StatusOK, gin.H{
 		"message": "Your photo has been successfully deleted",
 	})
 }
