@@ -480,6 +480,12 @@ paths:
         in: "header"
         required: false
         type: "string"
+      - name: "photoId"
+        in: "path"
+        description: "Photo id to update"
+        required: true
+        type: "integer"
+        format: "int64"
       - in: "body"
         name: "body"
         description: "Photo object that needs to be updated to db"
@@ -578,6 +584,12 @@ paths:
         in: "header"
         required: false
         type: "string"
+      - name: "photoId"
+        in: "path"
+        description: "Photo id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
       responses:
         "400":
           description: "Bad request"
@@ -635,7 +647,7 @@ paths:
     post:
       tags:
       - "Comment"
-      summary: "Post phooto"
+      summary: "Post comment"
       description: ""
       operationId: "postComment"
       consumes:
@@ -649,24 +661,20 @@ paths:
         type: "string"
       - in: "body"
         name: "body"
-        description: "Post photo that needs to be added to db"
+        description: "Post comment that needs to be added to db"
         required: true
         schema:
           type: "object"
           required:
-          - "title"
-          - "caption"
-          - "photo_url"
+          - "message"
+          - "photo_id"
           properties:
-            title:
+            message:
               type: "string"
-              example: "photo"
-            caption:
-              type: "string"
-              example: "caption photo"
-            photo_url:
-              type: "string"
-              example: "url.com/photo.jpg"
+              example: "comment photo.."
+            photo_id:
+              type: "integer"
+              example: "1"
       responses:
         "400":
           description: "Bad request"
@@ -679,6 +687,17 @@ paths:
               error:
                 type: "string"
                 example: "error message"
+        "404":
+          description: "No data found"
+          schema:
+              type: "object"
+              properties:
+                success:
+                  type: "boolean"
+                  example: false
+                error:
+                  type: "string"
+                  example: "Photo not found or has been deleted.."
         "500":
           description: "Internal server error"
           schema:
@@ -698,15 +717,12 @@ paths:
               id:
                 type: "integer"
                 example: "1"
-              title:
+              message:
                 type: "string"
-                example: "photo"
-              caption:
-                type: "string"
-                example: "caption photo"
-              photo_url:
-                type: "string"
-                example: "url.com/photo.jpg"
+                example: "comment photo.."
+              photo_id:
+                type: "integer"
+                example: "1"
               user_id:
                 type: "integer"
                 example: "1"
@@ -716,8 +732,8 @@ paths:
     get:
       tags:
       - "Comment"
-      summary: "Get all photo"
-      description: "get all photo"
+      summary: "Get all comment"
+      description: "get all comment"
       operationId: "getComment"
       produces:
       - "application/json"
@@ -728,7 +744,7 @@ paths:
         type: "string"
       responses:
         "200":
-          description: "successful get photos"
+          description: "successful get comments"
           schema:
             type: "array"
             items:
@@ -736,33 +752,51 @@ paths:
                 id:
                   type: "integer"
                   example: "1"
-                title:
+                message:
                   type: "string"
-                  example: "photo"
-                caption:
-                  type: "string"
-                  example: "caption photo"
-                photo_url:
-                  type: "string"
-                  example: "url.com/photo.jpg"
+                  example: "comment photo.."
+                photo_id:
+                  type: "integer"
+                  example: "1"
                 user_id:
                   type: "integer"
                   example: "1"
-                created_at:
+                updated_at:
                   type: "string"
                   example: "2022-07-30T18:22:42.6410344+07:00"
-                updated_at:
+                created_at:
                   type: "string"
                   example: "2022-07-30T18:22:42.6410344+07:00"
                 User:
                   type: "object"
                   properties:
+                    id:
+                      type: "integer"
+                      example: "1"
                     email:
                       type: "string"
                       example: "saipulmuiz87@gmail.com"
                     username:
                       type: "string"
                       example: "saipulmuiz"
+                Photo:
+                  type: "object"
+                  properties:
+                    id:
+                      type: "integer"
+                      example: "1"
+                    title:
+                      type: "string"
+                      example: "photo"
+                    caption:
+                      type: "string"
+                      example: "caption photo"
+                    photo_url:
+                      type: "string"
+                      example: "url.com/photo.jpg"
+                    user_id:
+                      type: "integer"
+                      example: "1"
         "500":
           description: "Internal server error"
           schema:
@@ -778,7 +812,7 @@ paths:
     put:
       tags:
       - "Comment"
-      summary: "Update an existing photo"
+      summary: "Update an existing comment"
       description: ""
       operationId: "updateComment"
       consumes:
@@ -790,6 +824,12 @@ paths:
         in: "header"
         required: false
         type: "string"
+      - name: "commentId"
+        in: "path"
+        description: "Comment id to update"
+        required: true
+        type: "integer"
+        format: "int64"
       - in: "body"
         name: "body"
         description: "Comment object that needs to be updated to db"
@@ -797,19 +837,11 @@ paths:
         schema:
           type: "object"
           required:
-          - "title"
-          - "caption"
-          - "photo_url"
+          - "message"
           properties:
-            title:
+            message:
               type: "string"
-              example: "photo update"
-            caption:
-              type: "string"
-              example: "caption photo update"
-            photo_url:
-              type: "string"
-              example: "url.com/photo_update.jpg"
+              example: "Comment update..."
       responses:
         "400":
           description: "Bad request"
@@ -863,22 +895,22 @@ paths:
               id:
                 type: "integer"
                 example: "1"
-              title:
+              message:
                 type: "string"
-                example: "photo update"
-              caption:
-                type: "string"
-                example: "caption photo update"
-              photo_url:
-                type: "string"
-                example: "url.com/photo_update.jpg"
+                example: "Comment update.."
+              photo_id:
+                type: "integer"
+                example: "1"
+              user_id:
+                type: "integer"
+                example: "1"
               updated_at:
                 type: "string"
                 example: "2022-07-30T18:22:42.6410344+07:00"
     delete:
       tags:
       - "Comment"
-      summary: "Delete a photo"
+      summary: "Delete a comment"
       description: ""
       operationId: "deleteComment"
       produces:
@@ -888,6 +920,12 @@ paths:
         in: "header"
         required: false
         type: "string"
+      - name: "commentId"
+        in: "path"
+        description: "Comment id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
       responses:
         "400":
           description: "Bad request"
@@ -940,4 +978,315 @@ paths:
             properties:
               message:
                 type: "string"
-                example: "Your photo has been successfully deleted"
+                example: "Your comment has been successfully deleted"
+  /socialmedias:
+    post:
+      tags:
+      - "Social Media"
+      summary: "Post social media"
+      description: ""
+      operationId: "postSocialMedia"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Post socialmedia that needs to be added to db"
+        required: true
+        schema:
+          type: "object"
+          required:
+          - "name"
+          - "social_media_url"
+          properties:
+            name:
+              type: "string"
+              example: "Instagram"
+            social_media_url:
+              type: "string"
+              example: "https://instagram.com/saipulmuiz"
+      responses:
+        "400":
+          description: "Bad request"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "201":
+          description: "Social Media posted successfully"
+          schema:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+                example: "1"
+              name:
+                type: "string"
+                example: "Instagram"
+              social_media_url:
+                type: "string"
+                example: "https://instagram.com/saipulmuiz"
+              user_id:
+                type: "integer"
+                example: "1"
+              created_at:
+                type: "string"
+                example: "2022-07-30T18:22:42.6410344+07:00"
+    get:
+      tags:
+      - "Social Media"
+      summary: "Get all social media"
+      description: "get all social media"
+      operationId: "getSocialMedia"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+      responses:
+        "200":
+          description: "successful get socialmedias"
+          schema:
+            type: "array"
+            items:
+              properties:
+                id:
+                  type: "integer"
+                  example: "1"
+                name:
+                  type: "string"
+                  example: "Instagram"
+                social_media_url:
+                  type: "string"
+                  example: "https://instagram.com/saipulmuiz"
+                user_id:
+                  type: "integer"
+                  example: "1"
+                created_at:
+                  type: "string"
+                  example: "2022-07-30T18:22:42.6410344+07:00"
+                updated_at:
+                  type: "string"
+                  example: "2022-07-30T18:22:42.6410344+07:00"
+                User:
+                  type: "object"
+                  properties:
+                    id:
+                      type: "integer"
+                      example: "1"
+                    username:
+                      type: "string"
+                      example: "saipulmuiz"
+                    profile_image_url:
+                      type: "string"
+                      example: "test image url"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+  /socialmedias/{socialMediaId}:
+    put:
+      tags:
+      - "Social Media"
+      summary: "Update an existing social media"
+      description: ""
+      operationId: "updateSocialMedia"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "socialMediaId"
+        in: "path"
+        description: "Social Media id to update"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "body"
+        description: "Social Media object that needs to be updated to db"
+        required: true
+        schema:
+          type: "object"
+          required:
+          - "name"
+          - "social_media_url"
+          properties:
+            name:
+              type: "string"
+              example: "Twitter"
+            social_media_url:
+              type: "string"
+              example: "https://twitter.com/saipulmuiz"
+      responses:
+        "400":
+          description: "Bad request"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "401":
+          description: "Unauthorized"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "404":
+          description: "No data found"
+          schema:
+              type: "object"
+              properties:
+                success:
+                  type: "boolean"
+                  example: false
+                error:
+                  type: "string"
+                  example: "error message"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "200":
+          description: "Social Media updated successfully"
+          schema:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+                example: "1"
+              name:
+                type: "string"
+                example: "Twitter"
+              social_media_url:
+                type: "string"
+                example: "https://twitter.com/saipulmuiz"
+              user_id:
+                type: "integer"
+                example: "1"
+              updated_at:
+                type: "string"
+                example: "2022-07-30T18:22:42.6410344+07:00"
+    delete:
+      tags:
+      - "Social Media"
+      summary: "Delete a social media"
+      description: ""
+      operationId: "deleteSocialMedia"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "socialMediaId"
+        in: "path"
+        description: "Social Media id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "400":
+          description: "Bad request"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "401":
+          description: "Unauthorized"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "404":
+          description: "No data found"
+          schema:
+              type: "object"
+              properties:
+                success:
+                  type: "boolean"
+                  example: false
+                error:
+                  type: "string"
+                  example: "error message"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "200":
+          description: "Social Media deleted successfully"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Your social media has been successfully deleted"
