@@ -1,0 +1,943 @@
+swagger: "2.0"
+info:
+  description: "This is a sample api for Final Project golang - Hacktiv8 - Saipul Muiz"
+  version: "1.0.0"
+  title: "Final Project Api - Saipul Muiz"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "saipulmuiz87@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost:4444"
+basePath: "/"
+tags:
+- name: "User"
+  description: "Access User data"
+- name: "Photo"
+  description: "Access Photo data"
+- name: "Comment"
+  description: "Access Comment data"
+- name: "Social Media"
+  description: "Access Social Media data"
+schemes:
+- "http"
+paths:
+  /users/register:
+    post:
+      tags:
+      - "User"
+      summary: "Register user"
+      description: ""
+      operationId: "registerUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Register object that needs to be added to db"
+        required: true
+        schema:
+          type: "object"
+          required:
+          - "email"
+          - "username"
+          - "password"
+          - "age"
+          properties:
+            age:
+              type: "integer"
+              example: "24"
+            email:
+              type: "string"
+              example: "saipulmuiz87@gmail.com"
+            password:
+              type: "string"
+              example: "saipul123"
+            username:
+              type: "string"
+              example: "saipulmuiz"
+      responses:
+        "400":
+          description: "Bad request"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "201":
+          description: "User registered successfully"
+          schema:
+            type: "object"
+            properties:
+              age:
+                type: "integer"
+                example: "24"
+              email:
+                type: "string"
+                example: "saipulmuiz87@gmail.com"
+              id:
+                type: "integer"
+                example: "1"
+              username:
+                type: "string"
+                example: "saipulmuiz"
+  /users/login:
+    post:
+      tags:
+      - "User"
+      summary: "Login user"
+      description: ""
+      operationId: "loginUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Login object that needs"
+        required: true
+        schema:
+          type: "object"
+          required:
+          - "email"
+          - "password"
+          properties:
+            email:
+              type: "string"
+              example: "saipulmuiz87@gmail.com"
+            password:
+              type: "string"
+              example: "saipul123"
+      responses:
+        "400":
+          description: "Bad request"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "401":
+          description: "Unauthorized"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "404":
+          description: "No data found"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "200":
+          description: "User login successfully"
+          schema:
+            type: "object"
+            properties:
+              token:
+                type: "string"
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluZEBnbWFpbC5jb20iLCJpZCI6MTR9.XDU1G4sduzy9kXWzwLT3BWukGCLV3NT_M_fs1kAXDl8"
+  /users:
+    put:
+      tags:
+      - "User"
+      summary: "Update an existing user"
+      description: ""
+      operationId: "updateUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "User object that needs to be updated to db"
+        required: true
+        schema:
+          type: "object"
+          required:
+          - "email"
+          - "username"
+          properties:
+            email:
+              type: "string"
+              example: "update@gmail.com"
+            username:
+              type: "string"
+              example: "update_username"
+      responses:
+        "400":
+          description: "Bad request"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "404":
+          description: "No data found"
+          schema:
+              type: "object"
+              properties:
+                success:
+                  type: "boolean"
+                  example: false
+                error:
+                  type: "string"
+                  example: "error message"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "200":
+          description: "User updated successfully"
+          schema:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+                example: "1"
+              email:
+                type: "string"
+                example: "update@gmail.com"
+              username:
+                type: "string"
+                example: "update_username"
+              age:
+                type: "integer"
+                example: "24"
+              updated_at:
+                type: "string"
+                example: "2022-07-30T18:22:42.6410344+07:00"
+    delete:
+      tags:
+      - "User"
+      summary: "Delete a user"
+      description: ""
+      operationId: "deleteUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+      responses:
+        "400":
+          description: "Bad request"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "404":
+          description: "No data found"
+          schema:
+              type: "object"
+              properties:
+                success:
+                  type: "boolean"
+                  example: false
+                error:
+                  type: "string"
+                  example: "error message"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "200":
+          description: "User deleted successfully"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Your account has been successfully deleted"
+  /photos:
+    post:
+      tags:
+      - "Photo"
+      summary: "Post photo"
+      description: ""
+      operationId: "postPhoto"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Post photo that needs to be added to db"
+        required: true
+        schema:
+          type: "object"
+          required:
+          - "title"
+          - "caption"
+          - "photo_url"
+          properties:
+            title:
+              type: "string"
+              example: "photo"
+            caption:
+              type: "string"
+              example: "caption photo"
+            photo_url:
+              type: "string"
+              example: "url.com/photo.jpg"
+      responses:
+        "400":
+          description: "Bad request"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "201":
+          description: "Photo posted successfully"
+          schema:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+                example: "1"
+              title:
+                type: "string"
+                example: "photo"
+              caption:
+                type: "string"
+                example: "caption photo"
+              photo_url:
+                type: "string"
+                example: "url.com/photo.jpg"
+              user_id:
+                type: "integer"
+                example: "1"
+              created_at:
+                type: "string"
+                example: "2022-07-30T18:22:42.6410344+07:00"
+    get:
+      tags:
+      - "Photo"
+      summary: "Get all photo"
+      description: "get all photo"
+      operationId: "getPhoto"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+      responses:
+        "200":
+          description: "successful get photos"
+          schema:
+            type: "array"
+            items:
+              properties:
+                id:
+                  type: "integer"
+                  example: "1"
+                title:
+                  type: "string"
+                  example: "photo"
+                caption:
+                  type: "string"
+                  example: "caption photo"
+                photo_url:
+                  type: "string"
+                  example: "url.com/photo.jpg"
+                user_id:
+                  type: "integer"
+                  example: "1"
+                created_at:
+                  type: "string"
+                  example: "2022-07-30T18:22:42.6410344+07:00"
+                updated_at:
+                  type: "string"
+                  example: "2022-07-30T18:22:42.6410344+07:00"
+                User:
+                  type: "object"
+                  properties:
+                    email:
+                      type: "string"
+                      example: "saipulmuiz87@gmail.com"
+                    username:
+                      type: "string"
+                      example: "saipulmuiz"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+  /photos/{photoId}:
+    put:
+      tags:
+      - "Photo"
+      summary: "Update an existing photo"
+      description: ""
+      operationId: "updatePhoto"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Photo object that needs to be updated to db"
+        required: true
+        schema:
+          type: "object"
+          required:
+          - "title"
+          - "caption"
+          - "photo_url"
+          properties:
+            title:
+              type: "string"
+              example: "photo update"
+            caption:
+              type: "string"
+              example: "caption photo update"
+            photo_url:
+              type: "string"
+              example: "url.com/photo_update.jpg"
+      responses:
+        "400":
+          description: "Bad request"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "401":
+          description: "Unauthorized"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "404":
+          description: "No data found"
+          schema:
+              type: "object"
+              properties:
+                success:
+                  type: "boolean"
+                  example: false
+                error:
+                  type: "string"
+                  example: "error message"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "200":
+          description: "Photo updated successfully"
+          schema:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+                example: "1"
+              title:
+                type: "string"
+                example: "photo update"
+              caption:
+                type: "string"
+                example: "caption photo update"
+              photo_url:
+                type: "string"
+                example: "url.com/photo_update.jpg"
+              updated_at:
+                type: "string"
+                example: "2022-07-30T18:22:42.6410344+07:00"
+    delete:
+      tags:
+      - "Photo"
+      summary: "Delete a photo"
+      description: ""
+      operationId: "deletePhoto"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+      responses:
+        "400":
+          description: "Bad request"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "401":
+          description: "Unauthorized"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "404":
+          description: "No data found"
+          schema:
+              type: "object"
+              properties:
+                success:
+                  type: "boolean"
+                  example: false
+                error:
+                  type: "string"
+                  example: "error message"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "200":
+          description: "Photo deleted successfully"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Your photo has been successfully deleted"
+  /comments:
+    post:
+      tags:
+      - "Comment"
+      summary: "Post phooto"
+      description: ""
+      operationId: "postComment"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Post photo that needs to be added to db"
+        required: true
+        schema:
+          type: "object"
+          required:
+          - "title"
+          - "caption"
+          - "photo_url"
+          properties:
+            title:
+              type: "string"
+              example: "photo"
+            caption:
+              type: "string"
+              example: "caption photo"
+            photo_url:
+              type: "string"
+              example: "url.com/photo.jpg"
+      responses:
+        "400":
+          description: "Bad request"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "201":
+          description: "Comment posted successfully"
+          schema:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+                example: "1"
+              title:
+                type: "string"
+                example: "photo"
+              caption:
+                type: "string"
+                example: "caption photo"
+              photo_url:
+                type: "string"
+                example: "url.com/photo.jpg"
+              user_id:
+                type: "integer"
+                example: "1"
+              created_at:
+                type: "string"
+                example: "2022-07-30T18:22:42.6410344+07:00"
+    get:
+      tags:
+      - "Comment"
+      summary: "Get all photo"
+      description: "get all photo"
+      operationId: "getComment"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+      responses:
+        "200":
+          description: "successful get photos"
+          schema:
+            type: "array"
+            items:
+              properties:
+                id:
+                  type: "integer"
+                  example: "1"
+                title:
+                  type: "string"
+                  example: "photo"
+                caption:
+                  type: "string"
+                  example: "caption photo"
+                photo_url:
+                  type: "string"
+                  example: "url.com/photo.jpg"
+                user_id:
+                  type: "integer"
+                  example: "1"
+                created_at:
+                  type: "string"
+                  example: "2022-07-30T18:22:42.6410344+07:00"
+                updated_at:
+                  type: "string"
+                  example: "2022-07-30T18:22:42.6410344+07:00"
+                User:
+                  type: "object"
+                  properties:
+                    email:
+                      type: "string"
+                      example: "saipulmuiz87@gmail.com"
+                    username:
+                      type: "string"
+                      example: "saipulmuiz"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+  /comments/{commentId}:
+    put:
+      tags:
+      - "Comment"
+      summary: "Update an existing photo"
+      description: ""
+      operationId: "updateComment"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Comment object that needs to be updated to db"
+        required: true
+        schema:
+          type: "object"
+          required:
+          - "title"
+          - "caption"
+          - "photo_url"
+          properties:
+            title:
+              type: "string"
+              example: "photo update"
+            caption:
+              type: "string"
+              example: "caption photo update"
+            photo_url:
+              type: "string"
+              example: "url.com/photo_update.jpg"
+      responses:
+        "400":
+          description: "Bad request"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "401":
+          description: "Unauthorized"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "404":
+          description: "No data found"
+          schema:
+              type: "object"
+              properties:
+                success:
+                  type: "boolean"
+                  example: false
+                error:
+                  type: "string"
+                  example: "error message"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "200":
+          description: "Comment updated successfully"
+          schema:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+                example: "1"
+              title:
+                type: "string"
+                example: "photo update"
+              caption:
+                type: "string"
+                example: "caption photo update"
+              photo_url:
+                type: "string"
+                example: "url.com/photo_update.jpg"
+              updated_at:
+                type: "string"
+                example: "2022-07-30T18:22:42.6410344+07:00"
+    delete:
+      tags:
+      - "Comment"
+      summary: "Delete a photo"
+      description: ""
+      operationId: "deleteComment"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+      responses:
+        "400":
+          description: "Bad request"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "401":
+          description: "Unauthorized"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "404":
+          description: "No data found"
+          schema:
+              type: "object"
+              properties:
+                success:
+                  type: "boolean"
+                  example: false
+                error:
+                  type: "string"
+                  example: "error message"
+        "500":
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+                example: false
+              error:
+                type: "string"
+                example: "error message"
+        "200":
+          description: "Comment deleted successfully"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Your photo has been successfully deleted"

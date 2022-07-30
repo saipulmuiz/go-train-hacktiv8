@@ -5,6 +5,7 @@ import (
 	"final-project/params"
 	"net/http"
 
+	valid "github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -18,16 +19,29 @@ func NewPhotoController(db *gorm.DB) *PhotoController {
 }
 
 func (p *PhotoController) CreatePhoto(ctx *gin.Context) {
-	var photo models.Photo
+	var photoReq params.PhotoRequest
 
-	err := ctx.ShouldBindJSON(&photo)
+	err := ctx.ShouldBindJSON(&photoReq)
 	if err != nil {
 		badRequestResponse(ctx, err.Error())
 		return
 	}
 
 	id, _ := ctx.Get("id")
-	photo.UserId = uint(id.(float64))
+	photoReq.UserId = uint(id.(float64))
+
+	_, errCreate := valid.ValidateStruct(&photoReq)
+	if errCreate != nil {
+		badRequestResponse(ctx, errCreate.Error())
+		return
+	}
+
+	photo := models.Photo{
+		Title:    photoReq.Title,
+		Caption:  photoReq.Caption,
+		PhotoUrl: photoReq.PhotoUrl,
+		UserId:   photoReq.UserId,
+	}
 
 	err = p.db.Create(&photo).Error
 	if err != nil {
@@ -79,9 +93,9 @@ func (p *PhotoController) GetPhotos(ctx *gin.Context) {
 
 func (p *PhotoController) UpdatePhoto(ctx *gin.Context) {
 	photoId := ctx.Param("photoId")
-	var photo models.Photo
+	var photoReq params.PhotoRequest
 
-	err := ctx.ShouldBindJSON(&photo)
+	err := ctx.ShouldBindJSON(&photoReq)
 	if err != nil {
 		badRequestResponse(ctx, err.Error())
 		return
@@ -103,6 +117,19 @@ func (p *PhotoController) UpdatePhoto(ctx *gin.Context) {
 	if photoDb.UserId != userId {
 		unauthorizeJsonResponse(ctx, "You have not access to this data..")
 		return
+	}
+
+	_, errUpdate := valid.ValidateStruct(&photoReq)
+	if errUpdate != nil {
+		badRequestResponse(ctx, errUpdate.Error())
+		return
+	}
+
+	photo := models.Photo{
+		Title:    photoReq.Title,
+		Caption:  photoReq.Caption,
+		PhotoUrl: photoReq.PhotoUrl,
+		UserId:   photoReq.UserId,
 	}
 
 	err = p.db.Model(&photoDb).Updates(&photo).Error

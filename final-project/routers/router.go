@@ -17,7 +17,6 @@ func StartServer() *gin.Engine {
 	commentController := controllers.NewCommentController(db)
 	socialMediaController := controllers.NewSocialMediaController(db)
 
-	// router.Use(middleware.Auth())
 	userGroup := router.Group("/users")
 	{
 		userGroup.POST("/register", userController.Register)

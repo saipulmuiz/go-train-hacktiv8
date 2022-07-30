@@ -5,6 +5,7 @@ import (
 	"final-project/params"
 	"net/http"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -18,16 +19,28 @@ func NewSocialMediaController(db *gorm.DB) *SocialMediaController {
 }
 
 func (s *SocialMediaController) CreateSocialMedia(ctx *gin.Context) {
-	var socialMedia models.SocialMedia
+	var socialMediaReq params.SocialMediaRequest
 
-	err := ctx.ShouldBindJSON(&socialMedia)
+	err := ctx.ShouldBindJSON(&socialMediaReq)
 	if err != nil {
 		badRequestResponse(ctx, err.Error())
 		return
 	}
 
 	id, _ := ctx.Get("id")
-	socialMedia.UserId = uint(id.(float64))
+	socialMediaReq.UserId = uint(id.(float64))
+
+	_, errCreate := govalidator.ValidateStruct(&socialMediaReq)
+	if errCreate != nil {
+		badRequestResponse(ctx, errCreate.Error())
+		return
+	}
+
+	socialMedia := models.SocialMedia{
+		Name:           socialMediaReq.Name,
+		SocialMediaUrl: socialMediaReq.SocialMediaUrl,
+		UserId:         socialMediaReq.UserId,
+	}
 
 	err = s.db.Create(&socialMedia).Error
 	if err != nil {
@@ -80,9 +93,9 @@ func (s *SocialMediaController) GetSocialMedias(ctx *gin.Context) {
 
 func (s *SocialMediaController) UpdateSocialMedia(ctx *gin.Context) {
 	socialMediaId := ctx.Param("socialMediaId")
-	var socialMedia models.SocialMedia
+	var socialMediaReq params.SocialMediaRequest
 
-	err := ctx.ShouldBindJSON(&socialMedia)
+	err := ctx.ShouldBindJSON(&socialMediaReq)
 	if err != nil {
 		badRequestResponse(ctx, err.Error())
 		return
@@ -104,6 +117,18 @@ func (s *SocialMediaController) UpdateSocialMedia(ctx *gin.Context) {
 	if socialMediaDb.UserId != userId {
 		unauthorizeJsonResponse(ctx, "You have not access to this data..")
 		return
+	}
+
+	_, errUpdate := govalidator.ValidateStruct(&socialMediaReq)
+	if errUpdate != nil {
+		badRequestResponse(ctx, errUpdate.Error())
+		return
+	}
+
+	socialMedia := models.SocialMedia{
+		Name:           socialMediaReq.Name,
+		SocialMediaUrl: socialMediaReq.SocialMediaUrl,
+		UserId:         socialMediaReq.UserId,
 	}
 
 	err = s.db.Model(&socialMediaDb).Updates(&socialMedia).Error

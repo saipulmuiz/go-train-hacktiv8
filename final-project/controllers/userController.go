@@ -20,18 +20,25 @@ func NewUserController(db *gorm.DB) *UserController {
 }
 
 func (u *UserController) Register(ctx *gin.Context) {
-	var user models.User
+	var userReq params.UserRegisterRequest
 
-	err := ctx.ShouldBindJSON(&user)
+	err := ctx.ShouldBindJSON(&userReq)
 	if err != nil {
 		badRequestResponse(ctx, err.Error())
 		return
 	}
 
-	_, errCreate := govalidator.ValidateStruct(&user)
+	_, errCreate := govalidator.ValidateStruct(&userReq)
 	if errCreate != nil {
 		badRequestResponse(ctx, errCreate.Error())
 		return
+	}
+
+	user := models.User{
+		Age:      userReq.Age,
+		Email:    userReq.Email,
+		Password: userReq.Password,
+		Username: userReq.Username,
 	}
 
 	err = u.db.Create(&user).Error
@@ -51,16 +58,22 @@ func (u *UserController) Register(ctx *gin.Context) {
 }
 
 func (u *UserController) Login(ctx *gin.Context) {
-	var user models.User
+	var userReq params.UserLoginRequest
 
-	err := ctx.ShouldBindJSON(&user)
+	err := ctx.ShouldBindJSON(&userReq)
 	if err != nil {
 		badRequestResponse(ctx, err.Error())
 		return
 	}
 
+	_, errLogin := govalidator.ValidateStruct(&userReq)
+	if errLogin != nil {
+		badRequestResponse(ctx, errLogin.Error())
+		return
+	}
+
 	var userDb models.User
-	err = u.db.First(&userDb, "email=?", user.Email).Error
+	err = u.db.First(&userDb, "email=?", userReq.Email).Error
 	if err != nil {
 		if err.Error() == gorm.ErrRecordNotFound.Error() {
 			noDataJsonResponse(ctx, err.Error())
@@ -70,7 +83,7 @@ func (u *UserController) Login(ctx *gin.Context) {
 		return
 	}
 
-	isValid := helper.ComparePassword(userDb.Password, user.Password)
+	isValid := helper.ComparePassword(userDb.Password, userReq.Password)
 
 	if !isValid {
 		unauthorizeJsonResponse(ctx, "email or password is not match")
@@ -91,9 +104,9 @@ func (u *UserController) Login(ctx *gin.Context) {
 func (u *UserController) UpdateUser(ctx *gin.Context) {
 	id, _ := ctx.Get("id")
 	userId := uint(id.(float64))
-	var user models.User
+	var userReq params.UserUpdateRequest
 
-	err := ctx.ShouldBindJSON(&user)
+	err := ctx.ShouldBindJSON(&userReq)
 	if err != nil {
 		badRequestResponse(ctx, err.Error())
 		return
@@ -108,6 +121,17 @@ func (u *UserController) UpdateUser(ctx *gin.Context) {
 		}
 		internalServerJsonResponse(ctx, err.Error())
 		return
+	}
+
+	_, errUpdate := govalidator.ValidateStruct(&userReq)
+	if errUpdate != nil {
+		badRequestResponse(ctx, errUpdate.Error())
+		return
+	}
+
+	user := models.User{
+		Email:    userReq.Email,
+		Username: userReq.Username,
 	}
 
 	err = u.db.Model(&userDb).Updates(&user).Error

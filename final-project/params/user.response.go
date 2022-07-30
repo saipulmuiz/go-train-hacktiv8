@@ -3,10 +3,10 @@ package params
 import "time"
 
 type UserRegisterResponse struct {
+	Age      uint   `json:"age"`
+	Email    string `json:"email"`
 	Id       uint   `json:"id"`
 	Username string `json:"username"`
-	Email    string `json:"email"`
-	Age      uint   `json:"age"`
 }
 
 type UserUpdateResponse struct {

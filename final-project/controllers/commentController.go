@@ -5,6 +5,7 @@ import (
 	"final-project/params"
 	"net/http"
 
+	valid "github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -18,19 +19,19 @@ func NewCommentController(db *gorm.DB) *CommentController {
 }
 
 func (c *CommentController) PostComment(ctx *gin.Context) {
-	var comment models.Comment
+	var commentReq params.CommentRequest
 
-	err := ctx.ShouldBindJSON(&comment)
+	err := ctx.ShouldBindJSON(&commentReq)
 	if err != nil {
 		badRequestResponse(ctx, err.Error())
 		return
 	}
 
 	id, _ := ctx.Get("id")
-	comment.UserId = uint(id.(float64))
+	commentReq.UserId = uint(id.(float64))
 
 	var photoDb models.Photo
-	err = c.db.Model(&photoDb).First(&photoDb, comment.PhotoId).Error
+	err = c.db.Model(&photoDb).First(&photoDb, commentReq.PhotoId).Error
 	if err != nil {
 		if err.Error() == gorm.ErrRecordNotFound.Error() {
 			noDataJsonResponse(ctx, "Photo not found or has been deleted..")
@@ -38,6 +39,18 @@ func (c *CommentController) PostComment(ctx *gin.Context) {
 		}
 		internalServerJsonResponse(ctx, err.Error())
 		return
+	}
+
+	_, errCreate := valid.ValidateStruct(&commentReq)
+	if errCreate != nil {
+		badRequestResponse(ctx, errCreate.Error())
+		return
+	}
+
+	comment := models.Comment{
+		Message: commentReq.Message,
+		PhotoId: commentReq.PhotoId,
+		UserId:  commentReq.UserId,
 	}
 
 	err = c.db.Create(&comment).Error
@@ -96,9 +109,9 @@ func (c *CommentController) GetComments(ctx *gin.Context) {
 
 func (c *CommentController) UpdateComment(ctx *gin.Context) {
 	commentId := ctx.Param("commentId")
-	var comment models.Comment
+	var commentReq params.CommentRequest
 
-	err := ctx.ShouldBindJSON(&comment)
+	err := ctx.ShouldBindJSON(&commentReq)
 	if err != nil {
 		badRequestResponse(ctx, err.Error())
 		return
@@ -120,6 +133,18 @@ func (c *CommentController) UpdateComment(ctx *gin.Context) {
 	if commentDb.UserId != userId {
 		unauthorizeJsonResponse(ctx, "You have not access to this data..")
 		return
+	}
+
+	_, errUpdate := valid.ValidateStruct(&commentReq)
+	if errUpdate != nil {
+		badRequestResponse(ctx, errUpdate.Error())
+		return
+	}
+
+	comment := models.Comment{
+		Message: commentReq.Message,
+		PhotoId: commentReq.PhotoId,
+		UserId:  commentReq.UserId,
 	}
 
 	err = c.db.Model(&commentDb).Updates(&comment).Error
